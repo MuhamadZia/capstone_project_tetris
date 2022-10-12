@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 # import seaborn as sns
 # import matplotlib.pyplot as plt
-import plotly.express as px
-import plotly.graph_objects as go
+# import plotly.express as px
+# import plotly.graph_objects as go
 
 st.title('Dampak Trend Elektrifikasi')
 st.write('Masa pandemi mempunyai banyak kisah yang tidak terduga dan era new normal.'+ 
@@ -39,5 +39,5 @@ with col_graph:
     chart_data = chart_data.rename(columns={'Year':'index'}).set_index('index')
     st.line_chart(chart_data)
 
-fig = px.line(elec_source[elec_source.Entity == option], x='Year', y=elec_source.columns[3])
-st.plotly_chart(fig)
+# fig = px.line(elec_source[elec_source.Entity == option], x='Year', y=elec_source.columns[3])
+# st.plotly_chart(fig)

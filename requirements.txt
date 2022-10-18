@@ -1,6 +1,6 @@
 streamlit
 pandas
 plotly
-re
+regex
 numpy
 scipy

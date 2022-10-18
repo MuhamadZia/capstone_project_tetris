@@ -445,6 +445,6 @@ dict_['Entity'] = col_entity
 dict_['Distance'] = col_dist
 
 data_dist = pd.DataFrame(dict_)
-data_dist = pd.merge(left=data_dist, right=dataset_for_suitable[['Entity','flag']], on='Entity', how='left')
+data_dist = pd.merge(left=data_dist, right=dataset_for_suitable[['Entity','flag' ,'Trend Carbon intensity of electricity (gCO2/kWh)']], on='Entity', how='left')
 data_best_dist = data_dist[data_dist.flag == 'good_trend'].sort_values(by=['Distance']).reset_index(drop=True).head(5)
 st.dataframe(data_best_dist)

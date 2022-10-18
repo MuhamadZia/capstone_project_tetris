@@ -124,7 +124,10 @@ def plot_trend(data, column, spacing, y_title, option, delta_color = 'normal'):
         x_fake = np.arange(x.min()+spacing, x.max()-spacing,spacing)
         df_dx = derivative(f, x_fake, dx=1e-6)
         
-        average = np.around(np.average(df_dx),4)
+        average = np.around(np.nanmean(df_dx),4)
+
+        print('check')
+        print(x_fake,df_dx)
 
         # print(f'trend of {column}')
         if average > 0 :
@@ -266,7 +269,7 @@ for col in columns:
             x_fake = np.arange(x.min()+spacing, x.max()-spacing,spacing)
             df_dx = derivative(f, x_fake, dx=1e-6)
 
-            average = np.around(np.average(df_dx),4)
+            average = np.around(np.nanmean(df_dx),4)
 
             cols_trend_value.append(average)
     
@@ -359,7 +362,7 @@ for col in columns:
             x_fake = np.arange(x.min()+spacing, x.max()-spacing,spacing)
             df_dx = derivative(f, x_fake, dx=1e-6)
 
-            average = np.around(np.average(df_dx),4)
+            average = np.around(np.nanmean(df_dx),4)
 
             cols_trend_value.append(average)
     

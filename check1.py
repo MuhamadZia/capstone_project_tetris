@@ -115,46 +115,50 @@ def plot_trend(data, column, spacing, y_title, option, delta_color = 'normal'):
     y=data[data.Entity == option][column]
 
     # print(x.info())
-
-    f = interp1d(x=x, y=y)
-    x_fake = np.arange(x.min()+spacing, x.max()-spacing,spacing)
-    df_dx = derivative(f, x_fake, dx=1e-6)
-    
-    average = np.around(np.average(df_dx),4)
-
-    # print(f'trend of {column}')
-    if average > 0 :
-        trend = "Uptrend"
-    elif average < 0:
-        trend = "Downtrend"
-    elif average == 0:
-        trend = "No trend!"
+    try:
+        f = interp1d(x=x, y=y)
+    except Exception:
+        st.write(f'Maaf, tidak ada data atau semua nol untuk {column}')
+        return np.nan, np.nan, np.nan
+    else:
+        x_fake = np.arange(x.min()+spacing, x.max()-spacing,spacing)
+        df_dx = derivative(f, x_fake, dx=1e-6)
         
-    st.metric(label=col, value=trend, delta=f"{average} (average)", delta_color=delta_color)
+        average = np.around(np.average(df_dx),4)
 
-    # Plot
-    tab1, tab2 = st.tabs(["📈 Chart Energy-Time", "🗃 Chart Trend"])
-    with tab1:
-        fig = px.line(x=x, y=y, template='none', markers=True)
-        fig.update_layout(
-            title = f"{column} of {option}",
-            yaxis_title= y_title
-        )
-        st.plotly_chart(fig)
-    with tab2:
-        fig = px.line(x=x_fake, y=df_dx, template='none', markers=True)
-        fig.update_layout(
-            title = f"Trend {column} of {option}",
-            yaxis_title= "Trend (df/dt)"
-        )
-        st.plotly_chart(fig)
+        # print(f'trend of {column}')
+        if average > 0 :
+            trend = "Uptrend"
+        elif average < 0:
+            trend = "Downtrend"
+        elif average == 0:
+            trend = "No trend!"
+            
+        st.metric(label=col, value=trend, delta=f"{average} (average)", delta_color=delta_color)
 
-        st.write('Average trend measure is:')
-        st.write(average)
-        st.write("Max trend measure is:")
-        st.write(np.around(np.max(df_dx),4))
-        st.write("min trend measure is:")
-        st.write(np.around(np.min(df_dx),4))
+        # Plot
+        tab1, tab2 = st.tabs(["📈 Chart Energy-Time", "🗃 Chart Trend"])
+        with tab1:
+            fig = px.line(x=x, y=y, template='none', markers=True)
+            fig.update_layout(
+                title = f"{column} of {option}",
+                yaxis_title= y_title
+            )
+            st.plotly_chart(fig)
+        with tab2:
+            fig = px.line(x=x_fake, y=df_dx, template='none', markers=True)
+            fig.update_layout(
+                title = f"Trend {column} of {option}",
+                yaxis_title= "Trend (df/dt)"
+            )
+            st.plotly_chart(fig)
+
+            st.write('Average trend measure is:')
+            st.write(average)
+            st.write("Max trend measure is:")
+            st.write(np.around(np.max(df_dx),4))
+            st.write("min trend measure is:")
+            st.write(np.around(np.min(df_dx),4))
 
 
     return x_fake, df_dx, average
@@ -191,7 +195,12 @@ data = elec_source
 list_source = []
 list_average = []
 
-option = st.selectbox('Pilih negara :', set(elec_source.Entity), key="check"+"1")
+carbon = pd.read_csv('carbon-intensity-electricity.csv')
+
+carbon['Year'] = carbon['Year'].astype('str')
+carbon['Year'] = carbon['Year'].astype('int64') 
+
+option = st.selectbox('Pilih negara :', set(carbon.Entity), key="check"+"1")
 tab1, tab2, tab3 = st.tabs(['Fossil (% electricity)', 'Renewable (% electricity)', 'Carbon intensity of electricity (gCO2/kWh)'])
 list_tabfirst = [tab1,tab2]
 for col, tab in zip(cols, list_tabfirst):
@@ -201,10 +210,10 @@ for col, tab in zip(cols, list_tabfirst):
     list_source.append(col)
     list_average.append(average)
 
-carbon = pd.read_csv('carbon-intensity-electricity.csv')
+# carbon = pd.read_csv('carbon-intensity-electricity.csv')
 
-carbon['Year'] = carbon['Year'].astype('str')
-carbon['Year'] = carbon['Year'].astype('int64')
+# carbon['Year'] = carbon['Year'].astype('str')
+# carbon['Year'] = carbon['Year'].astype('int64')
 
 col = carbon.columns[-1]
 data = carbon
@@ -231,6 +240,8 @@ def metrics_trend(list_source, list_average, idx, col_st, delta_color = 'normal'
         with col_st:
             st.metric(label=list_source[idx], value=trend, delta=f"{list_average[idx]} (average)", delta_color=delta_color)
 
+print(list_source)
+print(list_average)
 metrics_trend(list_source, list_average, idx=0, col_st=col0)
 metrics_trend(list_source, list_average, idx=1, col_st=col1)
 metrics_trend(list_source, list_average, idx=2, col_st=col2, delta_color='inverse')

@@ -36,7 +36,7 @@ st.write('Sumber energi yang kita gunakan berasal dari berbagai macam. Bagian in
 def sumber_energi(elec_source,list_energy,key):
     # elec_source = pd.read_csv('share-elec-by-source.csv')
     # elec_source['Year'] = pd.to_datetime(elec_source['Year'], format='%Y').dt.to_period('Y').to_timestamp()
-    # print(elec_source['Year'])
+    # # print(elec_source['Year'])
 
     elec_source['Year'] = elec_source['Year'].astype(str)
     # list_energy = []
@@ -95,7 +95,7 @@ sumber_energi(per_capita_energyGroup,list_energy_group, key='group_energy')
 st.subheader('Sumber energi menyeluruh (Spesifik)')
 elec_source = pd.read_csv('share-elec-by-source.csv')
 # elec_source['Year'] = pd.to_datetime(elec_source['Year'], format='%Y').dt.to_period('Y').to_timestamp()
-# print(elec_source['Year'])
+# # print(elec_source['Year'])
 
 elec_source['Year'] = elec_source['Year'].astype(str)
 list_energy = []
@@ -114,7 +114,7 @@ def plot_trend(data, column, spacing, y_title, option, delta_color = 'normal'):
     x=data[data.Entity == option]['Year']
     y=data[data.Entity == option][column]
 
-    # print(x.info())
+    # # print(x.info())
     try:
         f = interp1d(x=x, y=y)
     except Exception:
@@ -126,10 +126,10 @@ def plot_trend(data, column, spacing, y_title, option, delta_color = 'normal'):
         
         average = np.around(np.nanmean(df_dx),4)
 
-        print('check')
-        print(x_fake,df_dx)
+        # print('check')
+        # print(x_fake,df_dx)
 
-        # print(f'trend of {column}')
+        # # print(f'trend of {column}')
         if average > 0 :
             trend = "Uptrend"
         elif average < 0:
@@ -243,8 +243,8 @@ def metrics_trend(list_source, list_average, idx, col_st, delta_color = 'normal'
         with col_st:
             st.metric(label=list_source[idx], value=trend, delta=f"{list_average[idx]} (average)", delta_color=delta_color)
 
-print(list_source)
-print(list_average)
+# print(list_source)
+# print(list_average)
 metrics_trend(list_source, list_average, idx=0, col_st=col0)
 metrics_trend(list_source, list_average, idx=1, col_st=col1)
 metrics_trend(list_source, list_average, idx=2, col_st=col2, delta_color='inverse')
@@ -430,6 +430,7 @@ option = st.selectbox('Pilih negara :', set(cols_country), key="check"+"3")
 dict_ = {}
 col_entity = []
 col_dist = []
+col_factors = []
 for country in cols_country:
         
     entity_1 = dataset_for_suitable[dataset_for_suitable.Entity == option]
@@ -447,18 +448,51 @@ for country in cols_country:
 
     entity_1_cal = entity_1.drop(columns=cols_nan)
     entity_2_cal = entity_2.drop(columns=cols_nan)
-
-
     
     dist = cdist(entity_1_cal, entity_2_cal, metric='cosine')
+
+    col_factor = list(entity_1_cal.columns)
+    r1 = re.compile("(.*?)\s*\(")
+    factor = ', '.join(r1.match(factor).group(1) for factor in col_factor)
+
+    check = ', '.join(c for c in cols_nan_e2)
     
     col_entity.append(country)
     col_dist.append(dist[0][0])
+    col_factors.append(len(col_factor))
+
+    if country == 'Thailand':
+        print(entity_1.columns)
+        print('col_gather')
+        print(col_factor)
 
 dict_['Entity'] = col_entity
 dict_['Distance'] = col_dist
+dict_['Factors Observed'] = col_factors
 
 data_dist = pd.DataFrame(dict_)
+# print(data_dist)
 data_dist = pd.merge(left=data_dist, right=dataset_for_suitable[['Entity','flag' ,'Trend Carbon intensity of electricity (gCO2/kWh)']], on='Entity', how='left')
 data_best_dist = data_dist[data_dist.flag == 'good_trend'].sort_values(by=['Distance']).reset_index(drop=True).head(5)
-st.dataframe(data_best_dist)
+st.dataframe(data_best_dist[['Entity','Trend Carbon intensity of electricity (gCO2/kWh)']])
+
+col_five_closed = list(data_best_dist.Entity)
+df_five_rn_spesific = df_[df_.Entity.isin(col_five_closed)].T
+df_five_rn_spesific.columns = df_five_rn_spesific.iloc[0]
+df_five_rn_spesific.drop(df_five_rn_spesific.index[0], inplace=True)
+df_five_rn_spesific.reset_index(inplace=True)
+df_five_rn_spesific.rename(columns={'index':'Energy'}, inplace=True)
+
+data = df_five_rn_spesific
+
+tab1, tab2, tab3, tab4, tab5 = st.tabs(list(data.columns[1:]))
+col_tabs = [tab1, tab2, tab3, tab4, tab5]
+
+for col, tab in zip(data.columns[1:],col_tabs):
+    with tab:
+        fig = px.bar(data.sort_values(by=col, ascending=False), x=data.columns[0], y=col, template='none')
+        fig.update_layout(
+            title = f"Perbandingan Energi {col}",
+            yaxis_title= "Trend energy"
+        )
+        st.plotly_chart(fig)

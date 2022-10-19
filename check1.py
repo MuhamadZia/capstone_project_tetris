@@ -11,10 +11,10 @@ from scipy.interpolate import interp1d
 from scipy.misc import derivative
 from scipy.spatial.distance import cdist
 
-st.title('Dampak Elektrifikasi')
-st.write('Masa pandemi mempunyai banyak kisah yang tidak terduga dan era new normal.'+ 
-' Trend saat itu pasti seputar Covid 19.'+
-' Namun, ada trend lain yang menarik dan tidak berkaitan dengan pandemi yaitu kendaraan listrik.')
+st.title('Energi yang Digunakan dalam Elektrifikasi')
+st.markdown('<div style="text-align: justify;">Masa pandemi mempunyai banyak kisah yang tidak terduga dan era new normal. Salah satu trend yang tidak terduga adalah kendaraan listrik (electric vehicle).</div>', unsafe_allow_html=True)
+# st.write('Masa pandemi mempunyai banyak kisah yang tidak terduga dan era new normal.'+ 
+# ' Salah satu trend yang tidak terduga adalah kendaraan listrik (electric vehicle).')
 
 trend_electric_vehicle = pd.read_csv('multiTimeline electric vehicle trending.csv', header=1)
 trend_electric_vehicle['Minggu'] = pd.to_datetime(trend_electric_vehicle['Minggu'], format='%Y-%m-%d')
@@ -26,14 +26,35 @@ data.rename(columns={"Minggu":"Waktu"}, inplace=True)
 # plt.xlabel('waktu',fontsize=10)
 # plt.ylabel('trend',fontsize=10)
 # st.pyplot(fig)
+st.caption('sumber: Google Trend')
 st.line_chart(data, x=data.columns[0], y=data.columns[1])
 
-st.write('Kendaraan listrik dicetuskan karena cost kendaraan yang lebih rendah dan strategi mengurangi pemanasan global. Trend ini diikuti beberapa produk yang dielektrifikasi seperti kompor. Namun, apakah strategi itu mulai berdampak saat ini dan bagaimana kita mempersiapkan selanjutnya ?')
+text = 'Kendaraan listrik memiliki cost kendaraan yang lebih rendah dan berkontribusi dalam mengurangi pemanasan global. '\
+    'Dengan begitu, banyak yang menarik garis merah bahwa elektrifikasi dapat menguntungkan.'\
+    'Tetapi, apakah kesimpulan tersebut sudah tepat ? Jika melihat dari sumber energi yang digunakan, terdapat jenis sumber energi terbarukan (renewable) dan tidak terbarukan (non-renewable atau fossil) yang berkaitan erat dengan emisi. '\
+    'Sehingga, langkah elektrifikasi seperti kendaraan listrik masih awal. Tantangan selanjutnya sumber energi apa yang digunakan untuk alat listrik.'
+st.markdown(f'<div style="text-align: justify;">{text}</div>', unsafe_allow_html=True)
+
+text = """
+Target dari projek ini adalah menjawab pertanyaan:
+
+1. Bagaimana dampak trend energi Fossil dan trend energi Renewable terhadap Intensitas Carbon ?
+2. Bagaimana trend energi secara spesifik Dunia ?
+3. Apa negara yang memiliki trend energi Renewable tertinggi dan apa energi yang digunakannya ?
+4. Bagaimana mencari referensi negara untuk dipelajari suatu negera ?
+
+"""
+st.write("")
+st.markdown(text)
 
 st.header('Asal Sumber Energi Elektrifikasi')
-st.write('Sumber energi yang kita gunakan berasal dari berbagai macam. Bagian ini kita akan melihat sumber energi secara umum dan low-carbon')
+text = """
+Sumber energi yang kita gunakan berasal dari berbagai macam. Bagian ini kita akan melihat sumber energi secara umum dan rendah karbon. 
+Penjelasan yang tertera merupakan ringkasan energi Dunia (World).
+"""
+st.markdown(f'<div style="text-align: justify;">{text}</div>', unsafe_allow_html=True)
 
-def sumber_energi(elec_source,list_energy,key):
+def sumber_energi(elec_source,list_energy,key,y_title):
     # elec_source = pd.read_csv('share-elec-by-source.csv')
     # elec_source['Year'] = pd.to_datetime(elec_source['Year'], format='%Y').dt.to_period('Y').to_timestamp()
     # # print(elec_source['Year'])
@@ -44,6 +65,7 @@ def sumber_energi(elec_source,list_energy,key):
     #     x = re.search("[^\s]+",text)
     #     list_energy.append(x[0])
 
+    st.caption('Sumber: ourworldindata.org')
     col_filter, col_graph = st.columns(2)
     with col_filter:
         option = st.selectbox('Pilih negara :', set(elec_source.Entity), key=key+"1")
@@ -64,7 +86,7 @@ def sumber_energi(elec_source,list_energy,key):
             fig = px.line(data.sort_values(by='Year'), x='Year', y=data.columns[3:], template='none', markers=True)
             fig.update_layout(
                 title = f"Sumber Energi {option}",
-                yaxis_title= "% electricity"
+                yaxis_title= y_title
             )
             st.plotly_chart(fig)
 
@@ -77,11 +99,28 @@ def sumber_energi(elec_source,list_energy,key):
             fig = px.line(data.sort_values(by='Year'), x='Year', y=option_energy, template='none', markers=True, color='Entity')
             fig.update_layout(
                 title = f"Perbandingan Energi {option}",
-                yaxis_title= "% electricity"
+                yaxis_title= y_title
             )
             st.plotly_chart(fig)
 
 st.subheader('Sumber energi menyeluruh (kelompok)')
+# Paragraph 1
+text = """
+Energi Fossil Dunia memiliki trend naik, tetapi Energi Terbarukan (Renewable) selain nuklir juga naik. 
+Energi dunia ini tentunya dipengaruhi setiap negara maupun benua yang mempunyai sumber energi beragam sesuai keadaan.
+"""
+
+st.markdown(f'<div style="text-align: justify;">{text}</div>', unsafe_allow_html=True)
+# Paragraph 2
+st.markdown(
+"""
+Grafik data di bawah dapat diekplorasi berdasarkan negara dan jenis grafik:
+- Apabila perbandingan tidak diaktifkan, grafik yang muncul adalah energi Fossil, Renewable, dan Nuklir di negara yang dipilih
+- Apabila perbandingan diaktifkan, grafik yang muncul adalah perbandingan suatu energi dunia (World) dan negara yang dipilih. Jenis energi dapat dipilih juga.
+- Klik legend di samping gambar grafik untuk menghilangkan dan memunculkan grafik tertentu.
+"""
+)
+
 
 per_capita_energyGroup = pd.read_csv('per-capita-electricity-fossil-nuclear-renewables.csv')
 
@@ -90,9 +129,25 @@ for text in per_capita_energyGroup.columns[3:]:
     x = text.split()[0]
     list_energy_group.append(x)
 
-sumber_energi(per_capita_energyGroup,list_energy_group, key='group_energy')
+sumber_energi(per_capita_energyGroup,list_energy_group, key='group_energy', y_title='Energi (kWh) per Capita')
 
 st.subheader('Sumber energi menyeluruh (Spesifik)')
+text = """
+Energi Fossil terdiri dari Coal, Gas, dan Oil. Trend Coal dan Oil mengalami penurunan, sedangkan Gas naik. 
+Energi Terbarukan (Renewable) terdiri dari Hydro, Solar, Wind, Nuclear, dan Other. 
+Trend Nuclear mengalami penurunan, tetapi energi terbarukan lainnya mengalami peningkatan.
+"""
+
+st.markdown(f'<div style="text-align: justify;">{text}</div>', unsafe_allow_html=True)
+# Paragraph 2
+st.markdown(
+"""
+Grafik data di bawah dapat diekplorasi berdasarkan negara dan jenis grafik:
+- Apabila perbandingan tidak diaktifkan, grafik yang muncul adalah energi Fossil, Renewable, dan Nuklir di negara yang dipilih
+- Apabila perbandingan diaktifkan, grafik yang muncul adalah perbandingan suatu energi dunia (World) dan negara yang dipilih. Jenis energi dapat dipilih juga.
+- Klik legend di samping gambar grafik untuk menghilangkan dan memunculkan grafik tertentu.
+"""
+)
 elec_source = pd.read_csv('share-elec-by-source.csv')
 # elec_source['Year'] = pd.to_datetime(elec_source['Year'], format='%Y').dt.to_period('Y').to_timestamp()
 # # print(elec_source['Year'])
@@ -103,10 +158,33 @@ for text in elec_source.columns[3:]:
     x = re.search("[^\s]+",text)
     list_energy.append(x[0])
 
-sumber_energi(elec_source,list_energy,key="spesific energy")
+sumber_energi(elec_source,list_energy,key="spesific energy", y_title='% electricity')
 
 st.header('Trend Sumber Energi yang Digunakan')
-st.write('Setiap negara maupun benua mempunyai sumber energi yang beragam sesuai keadaan. Berikut trend sumber daya beserta intensitas CO2')
+text = """
+Sebelumnya, kita melihat grafik penggunaan energi dari seberapa banyak (% elecricity) dan seberapa besar (kWh). 
+Grafik tersebut ada yang menunjukan trend naik dan turun. 
+Bagian ini membahas trend dari kelompok energi: Fossil dan Renewable (termasuk nuklir). 
+Setelah mengetahui trend, di akhir bagian terdapat 5 negara dengan trend tertinggi di setiap kelompok energi dan intensitas CO2. 
+\n
+
+Energi dunia memiliki trend rata-rata menurun untuk Fossil (-0.0628) dan naik untuk Renewable (0.053). 
+Sehingga, intensitas CO2 menurun (-1.2552) dan ini menunjukan Renewable memiliki peran penting.
+Jika kita melihat ke setiap negara, umumnya intensitas CO2 yang menurun terpenuhi jika trend Renewable naik.
+
+\n
+"""
+
+st.markdown(f'<div style="text-align: justify;">{text}</div>', unsafe_allow_html=True)
+# Paragraph 2
+st.markdown(
+"""
+Grafik data di bawah dapat diekplorasi berdasarkan negara:
+- Tab pertama merupakan jenis data yang mau ditinjau, terdapat Fossil, Renewable, dan Intensitas CO2.
+- Tab kedua merupakan jenis grafik, terdapat grafik data utama dan trend-nya. Angka yang tertera metric trend rata-rata (average). 
+- Bagian terakhir merupakan metric trend dari semua jenis data dan 5 negara dengan tren tertinggi di setiap jenis data.
+"""
+)
 
 # col_even, col_odd = st.columns(2)
 def plot_trend(data, column, spacing, y_title, option, delta_color = 'normal'):
@@ -123,6 +201,8 @@ def plot_trend(data, column, spacing, y_title, option, delta_color = 'normal'):
     else:
         x_fake = np.arange(x.min()+spacing, x.max()-spacing,spacing)
         df_dx = derivative(f, x_fake, dx=1e-6)
+
+        # data_trend_ = pd.DataFrame({'value x_fake':x_fake,'value df_dx':df_dx})
         
         average = np.around(np.nanmean(df_dx),4)
 
@@ -142,7 +222,7 @@ def plot_trend(data, column, spacing, y_title, option, delta_color = 'normal'):
         # Plot
         tab1, tab2 = st.tabs(["📈 Chart Energy-Time", "🗃 Chart Trend"])
         with tab1:
-            fig = px.line(x=x, y=y, template='none', markers=True)
+            fig = px.line(data[data.Entity == option], x='Year', y=column, template='none', markers=True)
             fig.update_layout(
                 title = f"{column} of {option}",
                 yaxis_title= y_title
@@ -152,16 +232,17 @@ def plot_trend(data, column, spacing, y_title, option, delta_color = 'normal'):
             fig = px.line(x=x_fake, y=df_dx, template='none', markers=True)
             fig.update_layout(
                 title = f"Trend {column} of {option}",
-                yaxis_title= "Trend (df/dt)"
+                yaxis_title= y_title + " per Year",
+                xaxis_title = "Year"
             )
             st.plotly_chart(fig)
 
-            st.write('Average trend measure is:')
-            st.write(average)
-            st.write("Max trend measure is:")
-            st.write(np.around(np.max(df_dx),4))
-            st.write("min trend measure is:")
-            st.write(np.around(np.min(df_dx),4))
+            # st.write('Average trend measure is:')
+            # st.write(average)
+            # st.write("Max trend measure is:")
+            # st.write(np.around(np.max(df_dx),4))
+            # st.write("min trend measure is:")
+            # st.write(np.around(np.min(df_dx),4))
 
 
     return x_fake, df_dx, average
@@ -222,9 +303,14 @@ col = carbon.columns[-1]
 data = carbon
 
 with tab3:
-    x_fake, df_dx, average = plot_trend(data, column=col, spacing=0.5, y_title='% electricity', option=option, delta_color='inverse')
+    x_fake, df_dx, average = plot_trend(data, column=col, spacing=0.5, y_title='gCO2/kWh', option=option, delta_color='inverse')
 list_source.append(col)
 list_average.append(average)
+
+st.subheader("Semua trend rata-rata")
+text = 'Berikut metric trend energi Fossil, energi Renewable, dan Intensitas CO2:'
+st.markdown(f'<div style="text-align: justify;">{text}</div>', unsafe_allow_html=True)
+st.write("")
 
 col0, col1, col2 = st.columns(3)
 
@@ -244,7 +330,8 @@ def metrics_trend(list_source, list_average, idx, col_st, delta_color = 'normal'
             st.metric(label=list_source[idx], value=trend, delta=f"{list_average[idx]} (average)", delta_color=delta_color)
 
 # print(list_source)
-# print(list_average)
+# print(lis_average)
+
 metrics_trend(list_source, list_average, idx=0, col_st=col0)
 metrics_trend(list_source, list_average, idx=1, col_st=col1)
 metrics_trend(list_source, list_average, idx=2, col_st=col2, delta_color='inverse')
@@ -278,6 +365,11 @@ for col in columns:
 df_ = pd.DataFrame(dict_trend)
 df_.to_csv('trend_energy.csv', index=False)
 
+st.subheader("5 Negara trend tertinggi")
+text = 'Berikut 5 negara dengan trend tertinggi di energi Fossil, energi Renewable, dan Intensitas CO2:'
+st.markdown(f'<div style="text-align: justify;">{text}</div>', unsafe_allow_html=True)
+st.write("")
+
 tab1, tab2, tab3 = st.tabs(["5 Trend Tertinggi Fossil Energy", "5 Trend Tertinggi Renewable Energy", "5 Trend Menurun Intensitas CO2"])
 with tab1:
     df_five_fossil = df_.sort_values(by=df_.columns[1], ascending=False).head()
@@ -294,9 +386,39 @@ with tab3:
     df_five_CO2.reset_index(drop=True,inplace=True)
     st.dataframe(df_five_CO2)
 
+    # col_five_renewable =  list(df_five_CO2.Entity) # nanti ganti nama variablenya
+
 st.header('Trend Sumber Energi Spesifik (Renewable)')
-st.write('Setiap negara maupun benua mempunyai sumber energi yang beragam sesuai keadaan. \
-    Berikut trend sumber daya beserta intensitas CO2')
+text = """
+Sebelumnya, kita melihat grafik seberapa banyak (% elecricity) dan trend=nya. 
+Grafik tersebut merupakan jenis energi saja. 
+Bagian ini membahas trend pada energi yang lebih spesifik: Fossil terdiri atas Coal, Gas, Oil dan Renewable terdiri atas Wind, Hydro, Solar, Nuclear, Other.
+\n
+
+Energi Fossil di Dunia memiliki trend naik untuk Gas (0.2615) dan turun untuk Coal (-0.0728) dan Oil (-0.2515).
+Begitu juga dengan energi Renewable, trend naik dialami oleh Solar (0.0933), Wind (0.1739), dan Other (0.0521), sedangkan trend turun dialami oleh Hydro (-0.1165) dan Nuklir (-0.1498).
+
+\n
+
+Setiap negara maupun benua mempunyai sumber energi yang beragam sesuai keadaan. 
+Berikut trend sumber daya beserta intensitas CO2.
+
+\n
+"""
+
+st.markdown(f'<div style="text-align: justify;">{text}</div>', unsafe_allow_html=True)
+# Paragraph 2
+st.markdown(
+"""
+Grafik data di bawah dapat diekplorasi berdasarkan negara:
+- Trend energi spesifik: Berisi grafik penggunaan energi (% elecricity) dan trend-nya. Terdapat metrik setiap tab dan di bagian akhir untuk trend tertinggi dan terendah.
+Selain itu teradapat rangkuman:
+- 10 negara dengan trend tertinggi setiap energi. 
+- Trend energi pada 5 negara dengan trend intensitas CO2 terendah.
+"""
+)
+
+st.subheader("Trend energi spesifik")
 
 option = st.selectbox('Pilih negara :', set(elec_source.Entity), key="check"+"2")
 
@@ -341,6 +463,10 @@ for check, col in zip([max,min],[col1,col2]):
             st.caption('Trend Paling Rendah Sumber Energi')
             st.metric(label=source_min,value=trend,delta=min)
 
+st.subheader("10 negara dengan trend tertinggi setiap energi")
+text = 'Berikut 10 negara dengan trend tertinggi setiap energi:'
+st.markdown(f'<div style="text-align: justify;">{text}</div>', unsafe_allow_html=True)
+st.write("")
 
 data = elec_source[elec_source.columns[:-2]]
 cols_entity = list(data.Entity.unique())
@@ -391,6 +517,19 @@ df_five_rn_spesific.rename(columns={'index':'Energy'}, inplace=True)
 
 data = df_five_rn_spesific
 
+st.subheader("Trend energi pada 5 negara dengan trend energi Renewable tertinggi")
+text = """ 
+Trend energi pada 5 negara dengan trend energi Renewable tertinggi:
+- Cambodia: Trend tertinggi adalah Coal, tetapi trend oil sangat turun sehingga trend energi Fossil turun. Energi Renewable memiliki trend naik pada Hydro (Tertinggi), Other, dan Solar.
+- Denmark: Trend yang paling turun adalah Coal. Energi Renewable memiliki trend tertinggi di Wind, diikuti energi Renewable lainnya.
+- Estonia: Trend yang paling turun adalah Oil. Energi Renewable memiliki trend tertinggi di Other, diikuti energi Renewable lainnya kecuali Nuklir.
+- Falkland Islands: Trend yang paling turun adalah Oil dan Trend yang paling naik adalah Wind.
+- Sierra Leone: Trend yang paling turun adalah Oil dan Trend yang paling naik adalah Hydro.
+""" 
+# st.markdown(f'<div style="text-align: justify;">{text}</div>', unsafe_allow_html=True)
+st.markdown(text)
+st.write("")
+
 tab1, tab2, tab3, tab4, tab5 = st.tabs(list(data.columns[1:]))
 col_tabs = [tab1, tab2, tab3, tab4, tab5]
 
@@ -403,11 +542,50 @@ for col, tab in zip(data.columns[1:],col_tabs):
         )
         st.plotly_chart(fig)
 
-st.header('Penggunaan Renewable Energy')
-st.write('asd')
+st.header('Mencari Referensi Negara')
+text = """
+Energi Renewable Wind dan Hydro yang memiliki trend tertinggi pada 5 negara dengan trend Renewable tertinggi.
+Pengetahuan ini bisa menjadi referensi tindakan yang dilakukan negara tersebut. 
+Tetapi, sebelum mengambil keputusan mengembangkan energi Wind ataupun Hydro, kita perlu menjawab apakah kedua energi itu cocok diterapkan ?  
+\n
 
-st.header('Kecocokan dengan Negara')
-st.write('Setelah memahami keadaan setiap negara, sekarang dapat mencari negara dengan trend CO2 yang baik dan sesuai dengan keadaannya')
+Dengan keadaan setiap negara berbeda, perlu dicari kecocokan keadaan negara referensi dan negara yang mau menerapkannya. 
+Bagian ini dapat memberikan rekomendasi 5 negara berdasarkan faktor berikut:
+
+\n
+"""
+
+st.markdown(f'<div style="text-align: justify;">{text}</div>', unsafe_allow_html=True)
+
+text="""
+- Trend energi Fossil
+- Trend energi Renewable
+- Trend intensitas CO2
+- Rata-rata persentase area Algikultural
+- Rata-rata trend persentase area Algikultural
+- Rata-rata persentase area Hutan
+- Rata-rata trend persentase area Hutan
+- Rata-rata GDP per kapita
+- Rata-rata trend GDP per kapita
+- Indeks persepsi korupsi
+- Indeks perkembangan manusia
+
+"""
+st.markdown(text)
+
+text="""
+keterangan: faktor-faktor tersebut disesuaikan dengan keberadaan data di negara-negara yang ditinjau
+"""
+st.markdown(f'<div style="text-align: justify;">{text}</div>', unsafe_allow_html=True)
+st.write("")
+
+st.markdown(
+"""
+Grafik dan data di bawah dapat diekplorasi berdasarkan negara:
+- Tabel urutan negara berdasarkan keadaan yang paling dekat. Semakin kecil nilai Distance, semakin dekat.
+- Tab negara yang berisi trend energi yang digunakannya dan faktor yang ditinjau.
+"""
+)
 
 data_prossed_worldbank = pd.read_csv('data_prossed_worldbank.csv')
 
@@ -455,11 +633,11 @@ for country in cols_country:
     r1 = re.compile("(.*?)\s*\(")
     factor = ', '.join(r1.match(factor).group(1) for factor in col_factor)
 
-    check = ', '.join(c for c in cols_nan_e2)
+    # check = ', '.join(c for c in cols_nan_e2)
     
     col_entity.append(country)
     col_dist.append(dist[0][0])
-    col_factors.append(len(col_factor))
+    col_factors.append(factor)
 
     if country == 'Thailand':
         print(entity_1.columns)
@@ -474,7 +652,20 @@ data_dist = pd.DataFrame(dict_)
 # print(data_dist)
 data_dist = pd.merge(left=data_dist, right=dataset_for_suitable[['Entity','flag' ,'Trend Carbon intensity of electricity (gCO2/kWh)']], on='Entity', how='left')
 data_best_dist = data_dist[data_dist.flag == 'good_trend'].sort_values(by=['Distance']).reset_index(drop=True).head(5)
-st.dataframe(data_best_dist[['Entity','Trend Carbon intensity of electricity (gCO2/kWh)']])
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.dataframe(data_best_dist[['Entity','Distance','Trend Carbon intensity of electricity (gCO2/kWh)']])
+with col2:
+    average = dataset_for_suitable[dataset_for_suitable.Entity == option]['Trend Carbon intensity of electricity (gCO2/kWh)'].iloc[0]
+    if average > 0 :
+        trend = "Uptrend"
+    elif average < 0:
+        trend = "Downtrend"
+    elif average == 0:
+        trend = "No trend!"
+    st.metric(label=f"Trend Carbon intensity of {option}", value=trend, delta=average, delta_color='inverse')
 
 col_five_closed = list(data_best_dist.Entity)
 df_five_rn_spesific = df_[df_.Entity.isin(col_five_closed)].T
@@ -490,9 +681,28 @@ col_tabs = [tab1, tab2, tab3, tab4, tab5]
 
 for col, tab in zip(data.columns[1:],col_tabs):
     with tab:
+        st.caption('Sumber: ourworldata.org dan data.worldbank.org')
         fig = px.bar(data.sort_values(by=col, ascending=False), x=data.columns[0], y=col, template='none')
         fig.update_layout(
             title = f"Perbandingan Energi {col}",
             yaxis_title= "Trend energy"
         )
         st.plotly_chart(fig)
+
+        factors = data_best_dist['Factors Observed'][data_best_dist.Entity == col].iloc[0]
+        list_factors = factors.split(",")
+        st.write(f'Faktor yang ditinjau ({len(list_factors)}):')
+        for factor in list_factors: 
+            st.markdown(f"""
+            - {factor}
+            """)
+
+st.header('Kesimpulan')
+text="""
+1. Energi Dunia memiliki trend rata-rata menurun untuk Fossil (-0.0628) dan naik untuk Renewable (0.053). Sehingga, intensitas CO2 menurun (-1.2552) dan ini menunjukan Renewable memiliki peran penting. Jika ditinjau tiap negara, umumnya, trend intensitas CO2 menurun saat trend energi Renewable naik.
+2. Energi Fossil di Dunia memiliki trend naik untuk Gas (0.2615) dan turun untuk Coal (-0.0728) dan Oil (-0.2515). Begitu juga dengan energi Renewable, trend naik dialami oleh Solar (0.0933), Wind (0.1739), dan Other (0.0521), sedangkan trend turun dialami oleh Hydro (-0.1165) dan Nuklir (-0.1498).
+3. Lima negara dengan trend energi Renewable tertinggi adalah Cambodia, Denmark, Estonia, Falkland Islands, dan Sierra Leone. Umumnya, energi Renewable yang digunakan adalah Hydro dan Wind.
+4. Mencari referensi negara untuk dipelajari dapat dilihat dengan jarak antar faktor-faktor yang ditinjau. Projek ini berhasil melakukan pencarian dengan memaksimalkan data yang ada.
+
+"""
+st.markdown(text)

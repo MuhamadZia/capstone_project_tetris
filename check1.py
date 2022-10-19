@@ -40,8 +40,9 @@ Target dari projek ini adalah menjawab pertanyaan:
 
 1. Bagaimana dampak trend energi Fossil dan trend energi Renewable terhadap Intensitas Carbon ?
 2. Bagaimana trend energi secara spesifik Dunia ?
-3. Apa negara yang memiliki trend energi Renewable tertinggi dan apa energi yang digunakannya ?
-4. Bagaimana mencari referensi negara untuk dipelajari suatu negera ?
+3. Apa negara dengan trend tertinggi di setiap energi spesifik ?
+4. Apa negara yang memiliki trend energi Renewable tertinggi dan apa energi yang digunakannya ?
+5. Bagaimana mencari referensi negara untuk dipelajari suatu negera ?
 
 """
 st.write("")
@@ -216,7 +217,8 @@ def plot_trend(data, column, spacing, y_title, option, delta_color = 'normal'):
             trend = "Downtrend"
         elif average == 0:
             trend = "No trend!"
-            
+        
+        st.caption('Sumber: ourworldindata.org')    
         st.metric(label=col, value=trend, delta=f"{average} (average)", delta_color=delta_color)
 
         # Plot
@@ -499,8 +501,10 @@ df_ = pd.DataFrame(dict_trend)
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(list(df_.columns[1:]))
 tabs_energy = [tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8]
 
+
 for col, tab in zip(df_.columns[1:], tabs_energy):
     with tab:
+        st.caption('Sumber: ourworldindata.org')
         df_sorted = df_.sort_values(by=col, ascending=False).head(10)
         fig = px.bar(df_sorted, x=df_sorted.Entity, y=col, template='none')
         fig.update_layout(
@@ -535,6 +539,7 @@ col_tabs = [tab1, tab2, tab3, tab4, tab5]
 
 for col, tab in zip(data.columns[1:],col_tabs):
     with tab:
+        st.caption('Sumber: ourworldindata.org')
         fig = px.bar(data.sort_values(by=col, ascending=False), x=data.columns[0], y=col, template='none')
         fig.update_layout(
             title = f"Perbandingan Energi {col}",
@@ -701,8 +706,9 @@ st.header('Kesimpulan')
 text="""
 1. Energi Dunia memiliki trend rata-rata menurun untuk Fossil (-0.0628) dan naik untuk Renewable (0.053). Sehingga, intensitas CO2 menurun (-1.2552) dan ini menunjukan Renewable memiliki peran penting. Jika ditinjau tiap negara, umumnya, trend intensitas CO2 menurun saat trend energi Renewable naik.
 2. Energi Fossil di Dunia memiliki trend naik untuk Gas (0.2615) dan turun untuk Coal (-0.0728) dan Oil (-0.2515). Begitu juga dengan energi Renewable, trend naik dialami oleh Solar (0.0933), Wind (0.1739), dan Other (0.0521), sedangkan trend turun dialami oleh Hydro (-0.1165) dan Nuklir (-0.1498).
-3. Lima negara dengan trend energi Renewable tertinggi adalah Cambodia, Denmark, Estonia, Falkland Islands, dan Sierra Leone. Umumnya, energi Renewable yang digunakan adalah Hydro dan Wind.
-4. Mencari referensi negara untuk dipelajari dapat dilihat dengan jarak antar faktor-faktor yang ditinjau. Projek ini berhasil melakukan pencarian dengan memaksimalkan data yang ada.
+3. Negara dengan trend di setiap energi dapat dilihat pada bagian "10 negara dengan trend tertinggi setiap energi"
+4. Lima negara dengan trend energi Renewable tertinggi adalah Cambodia, Denmark, Estonia, Falkland Islands, dan Sierra Leone. Umumnya, energi Renewable yang digunakan adalah Hydro dan Wind.
+5. Mencari referensi negara untuk dipelajari dapat dilihat dengan jarak antar faktor-faktor yang ditinjau. Projek ini berhasil melakukan pencarian dengan memaksimalkan data yang ada. Jenis energi yang sama bisa juga dipelajari dari negara dengan trend tertinggi pada energi tersebut.
 
 """
 st.markdown(text)
